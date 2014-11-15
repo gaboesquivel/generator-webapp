@@ -184,5 +184,19 @@ describe('Webapp generator', function () {
         done();
       });
     });
+
+     it('creates expected includeReplace files', function (done) {
+      runGen.withOptions(options).withPrompt({features: ['includeIncludeReplace'] })
+        .on('end', function () {
+
+        assert.fileContent([
+          ['package.json', /grunt-include-replace/],
+          ['Gruntfile.js', /includereplace/],
+          ['app/includes/message.html', /grunt-include-replace/]
+        ]);
+
+        done();
+      });
+    });
   });
 });

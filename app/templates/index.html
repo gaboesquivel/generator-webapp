@@ -57,6 +57,10 @@
           <% if (includeModernizr) { %><h4>Modernizr</h4>
           <p>Modernizr is an open-source JavaScript library that helps you build the next generation of HTML5 and CSS3-powered websites.</p>
           <% } %>
+
+          <% if (includeIncludeReplace) { %>
+           @@include('message.html')
+          <% } %>
         </div>
       </div>
 

@@ -65,19 +65,43 @@ module.exports = function (grunt) {
       styles: {
         files: ['<%%= config.app %>/styles/{,*/}*.css'],
         tasks: ['newer:copy:styles', 'autoprefixer']
+      },<% if (includeIncludeReplace) { %>
+      html: {
+        files: ['<%= config.app %>/{,*/}*.html'],
+        tasks: ['includereplace']
       },
+      <% } %>
       livereload: {
         options: {
           livereload: '<%%= connect.options.livereload %>'
         },
         files: [
-          '<%%= config.app %>/{,*/}*.html',
+          <% if (includeIncludeReplace) { %>
+          '.tmp/{,*/}*.html',
+          <% } else { %>
+            '<%%= config.app %>/{,*/}*.html',
+          <% } %>
           '.tmp/styles/{,*/}*.css',<% if (coffee) { %>
           '.tmp/scripts/{,*/}*.js',<% } %>
           '<%%= config.app %>/images/{,*/}*'
         ]
       }
     },
+
+    <% if (includeIncludeReplace) { %>
+    // Includes html
+    includereplace: {
+      include: {
+        options: {
+          includesDir: 'app/includes/'
+        },
+        src: ['{,*/}*.html', '!includes/{,*/}*.*'],
+        dest: '.tmp/',
+        expand: true,
+        cwd: 'app/'
+      }
+    },
+    <% } %>
 
     // The actual grunt server settings
     connect: {
@@ -368,13 +392,20 @@ module.exports = function (grunt) {
           src: [
             '*.{ico,png,txt}',
             'images/{,*/}*.webp',
-            '{,*/}*.html',
-            'styles/fonts/{,*/}*.*'
+            'styles/fonts/{,*/}*.*'<% if (!includeIncludeReplace) { %>,
+            '{,*/}*.html'<% } %>
           ]
         }, {
           src: 'node_modules/apache-server-configs/dist/.htaccess',
           dest: '<%%= config.dist %>/.htaccess'
-        }<% if (includeBootstrap) { %>, {
+        }<% if (includeIncludeReplace) { %>,
+        {
+          expand: true,
+          dot: true,
+          cwd: '.tmp',
+          dest: '<%%= config.dist %>',
+          src: '{,*/}*.html'
+        }<% } %> <% if (includeBootstrap) { %>, {
           expand: true,
           dot: true,
           cwd: '<% if (includeSass) {
@@ -421,16 +452,19 @@ module.exports = function (grunt) {
       server: [<% if (coffee) {  %>
         'coffee:dist'<% } %><% if (coffee && includeSass) {  %>,<% } %><% if (includeSass) { %>
         'sass:server'<% } else { %>
-        'copy:styles'<% } %>
+        'copy:styles'<% } %><% if (includeIncludeReplace) { %>,
+        'includereplace'<% } %>
       ],
       test: [<% if (coffee) { %>
         'coffee',<% } %><% if (coffee && !includeSass) {  %>,<% } %><% if (!includeSass) { %>
-        'copy:styles'<% } %>
+        'copy:styles'<% } %><% if (includeIncludeReplace) { %>,
+        'includereplace'<% } %>
       ],
       dist: [<% if (coffee) { %>
         'coffee',<% } %><% if (includeSass) { %>
         'sass',<% } else { %>
-        'copy:styles',<% } %>
+        'copy:styles',<% } %><% if (includeIncludeReplace) { %>
+        'includereplace',<% } %>
         'imagemin',
         'svgmin'
       ]

@@ -54,6 +54,10 @@ module.exports = yeoman.generators.Base.extend({
         name: 'Modernizr',
         value: 'includeModernizr',
         checked: false
+      },{
+        name: 'IncludeReplace',
+        value: 'includeIncludeReplace',
+        checked: false
       }]
     }, {
       when: function (answers) {
@@ -78,6 +82,7 @@ module.exports = yeoman.generators.Base.extend({
       this.includeSass = hasFeature('includeSass');
       this.includeBootstrap = hasFeature('includeBootstrap');
       this.includeModernizr = hasFeature('includeModernizr');
+      this.includeIncludeReplace = hasFeature('includeIncludeReplace');
 
       this.includeLibSass = answers.libsass;
       this.includeRubySass = !answers.libsass;
@@ -181,6 +186,11 @@ module.exports = yeoman.generators.Base.extend({
     this.mkdir('app/styles');
     this.mkdir('app/images');
     this.write('app/index.html', this.indexFile);
+
+    if (this.includeIncludeReplace) {
+      this.mkdir('app/includes');
+      this.write('app/includes/message.html', '<h4>grunt-include-replace</h4>\n<p>Grunt task to include files and replace variables.</p>');
+    }
 
     if (this.coffee) {
       this.write(
